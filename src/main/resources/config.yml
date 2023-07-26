@@ -1,0 +1,17 @@
+config-version: 1
+
+Difficulty:
+  easy:
+    DamageTakenMultiplier: 0.75
+    AttackDamageMultiplier: 1.25
+    ExpMultiplier: 0.75
+  normal:
+    DamageTakenMultiplier: 1
+    AttackDamageMultiplier: 1
+    ExpMultiplier: 1
+  hard:
+    DamageTakenMultiplier: 1.25
+    AttackDamageMultiplier: 0.75
+    ExpMultiplier: 1.25
+  custom_1:
+    ExpMultiplier: 2

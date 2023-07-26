@@ -1,0 +1,15 @@
+name: PersonalDifficulty
+version: 1.0 #'${project.version}'
+main: me.msicraft.personaldifficulty.PersonalDifficulty
+api-version: 1.16
+authors: [ msicraft ]
+description: Personal Difficulty Plugin
+commands:
+  personaldifficulty:
+    description: Main command
+    aliases: [pd]
+    permission: personaldifficulty.command
+permissions:
+  personaldifficulty.command.help:
+    description: Allow help commnad
+    default: op
