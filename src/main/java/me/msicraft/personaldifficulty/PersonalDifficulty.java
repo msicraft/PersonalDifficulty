@@ -53,7 +53,7 @@ public final class PersonalDifficulty extends JavaPlugin {
         eventRegister();
         getCommand("personaldifficulty").setExecutor(new MainCommand());
         getCommand("personaldifficulty").setTabCompleter(new MainTabComplete());
-        new UpdateChecker(this, -1).getPluginUpdateCheck(version -> {
+        new UpdateChecker(this, 111523).getPluginUpdateCheck(version -> {
             if (this.getDescription().getVersion().equals(version)) {
                 getLogger().info("There is not a new update available.");
             } else {
