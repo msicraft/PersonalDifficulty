@@ -91,6 +91,7 @@ public final class PersonalDifficulty extends JavaPlugin {
 
     public void reloadDataFiles() {
         reloadConfig();
+        messageConfig.reloadConfig();
         DifficultyUtil.setUp();
     }
 

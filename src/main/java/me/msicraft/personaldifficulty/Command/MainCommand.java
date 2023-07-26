@@ -58,6 +58,10 @@ public class MainCommand implements CommandExecutor {
                             }
                             break;
                         case "get":
+                            if (!sender.hasPermission("personaldifficulty.command.get")) {
+                                sendPermissionMessage(sender);
+                                return true;
+                            }
                             try {
                                 target = Bukkit.getPlayer(args[1]);
                             } catch (ArrayIndexOutOfBoundsException e) {
@@ -72,6 +76,10 @@ public class MainCommand implements CommandExecutor {
                             }
                             break;
                         case "set":
+                            if (!sender.hasPermission("personaldifficulty.command.set")) {
+                                sendPermissionMessage(sender);
+                                return true;
+                            }
                             String difficulty = CustomDifficulty.basicDifficulty.basic.name();
                             try {
                                 target = Bukkit.getPlayer(args[1]);
