@@ -1,5 +1,18 @@
 config-version: 1
 
+EnvironmentalDamageList:
+  - CONTACT
+  - CRAMMING
+  - DROWNING
+  - DRYOUT
+  - FALL
+  - FALLING_BLOCK
+  - FIRE
+  - HOT_FLOOR
+  - LIGHTNING
+  - STARVATION
+  - SUFFOCATION
+
 Difficulty:
   easy:
     DamageTakenMultiplier: 0.75
@@ -15,3 +28,4 @@ Difficulty:
     ExpMultiplier: 1.25
   custom_1:
     ExpMultiplier: 2
+    EnvironmentMultiplier: 1.0

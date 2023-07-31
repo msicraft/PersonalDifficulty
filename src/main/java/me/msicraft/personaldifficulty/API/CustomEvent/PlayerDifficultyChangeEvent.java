@@ -1,6 +1,6 @@
 package me.msicraft.personaldifficulty.API.CustomEvent;
 
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -8,18 +8,18 @@ public class PlayerDifficultyChangeEvent extends Event {
 
     private final static HandlerList handlers = new HandlerList();
 
-    private Player player;
+    private OfflinePlayer offlinePlayer;
     private String beforeDifficulty;
     private String afterDifficulty;
 
-    public PlayerDifficultyChangeEvent(Player player, String beforeDifficulty, String afterDifficulty) {
-        this.player = player;
+    public PlayerDifficultyChangeEvent(OfflinePlayer offlinePlayer, String beforeDifficulty, String afterDifficulty) {
+        this.offlinePlayer= offlinePlayer;
         this.beforeDifficulty = beforeDifficulty;
         this.afterDifficulty = afterDifficulty;
     }
 
-    public Player getPlayer() {
-        return player;
+    public OfflinePlayer getPlayer() {
+        return offlinePlayer;
     }
 
     public String getBeforeDifficulty() {

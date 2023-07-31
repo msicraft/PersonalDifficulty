@@ -16,8 +16,7 @@ import java.util.UUID;
 
 public class PlayerDataFile {
 
-    private final PersonalDifficulty plugin = PersonalDifficulty.getPlugin();
-    private final String folderpath = "PlayerData";
+    private static final String folderpath = PersonalDifficulty.getPlugin().getDataFolder() + File.separator + "PlayerData";
     private File file;
     private FileConfiguration config;
 
@@ -25,9 +24,20 @@ public class PlayerDataFile {
     public FileConfiguration getConfig() { return this.config; }
     public boolean hasConfigFile() { return this.file.exists(); }
 
+    public static boolean hasFile(UUID uuid) {
+        String fileS = uuid.toString() + ".yml";
+        File file = new File(folderpath, fileS);
+        return file.exists();
+    }
+
+    public static File[] getDataFileList() {
+        File folder = new File(folderpath);
+        return folder.listFiles();
+    }
+
     public PlayerDataFile(Player player) {
         String fileS = player.getUniqueId() + ".yml";
-        this.file = new File(plugin.getDataFolder() + File.separator + folderpath, fileS);
+        this.file = new File(folderpath, fileS);
         if (!file.exists()) {
             createFile(player);
         }
@@ -36,7 +46,7 @@ public class PlayerDataFile {
 
     public PlayerDataFile(UUID uuid) {
         String fileS = uuid.toString() + ".yml";
-        this.file = new File(plugin.getDataFolder() + File.separator + folderpath, fileS);
+        this.file = new File(folderpath, fileS);
         if (!file.exists()) {
             createFile(uuid);
         }
@@ -48,7 +58,7 @@ public class PlayerDataFile {
             try {
                 YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(this.file);
                 yamlConfiguration.set("Name", player.getName());
-                yamlConfiguration.set("Difficulty", CustomDifficulty.basicDifficulty.basic.name());
+                yamlConfiguration.set("Difficulty", CustomDifficulty.BasicDifficulty.basic.name());
                 yamlConfiguration.save(this.file);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -62,7 +72,7 @@ public class PlayerDataFile {
                 YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(this.file);
                 OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
                 yamlConfiguration.set("Name", offlinePlayer.getName());
-                yamlConfiguration.set("Difficulty", CustomDifficulty.basicDifficulty.basic.name());
+                yamlConfiguration.set("Difficulty", CustomDifficulty.BasicDifficulty.basic.name());
                 yamlConfiguration.save(this.file);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -78,7 +88,7 @@ public class PlayerDataFile {
         this.config = YamlConfiguration.loadConfiguration(this.file);
         Reader defaultConfigStream;
         try {
-            defaultConfigStream = new InputStreamReader(plugin.getResource(this.file.getName()), StandardCharsets.UTF_8);
+            defaultConfigStream = new InputStreamReader(PersonalDifficulty.getPlugin().getResource(this.file.getName()), StandardCharsets.UTF_8);
             if(defaultConfigStream != null) {
                 YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(defaultConfigStream);
                 config.setDefaults(defaultConfig);
@@ -99,10 +109,10 @@ public class PlayerDataFile {
     public void saveDefaultConfig(Player player) {
         String fileS = player.getUniqueId() + ".yml";
         if (this.file == null) {
-            this.file = new File(plugin.getDataFolder() + File.separator + this.folderpath, fileS);
+            this.file = new File(folderpath, fileS);
         }
         if (!this.file.exists()) {
-            plugin.saveResource(fileS, false);
+            PersonalDifficulty.getPlugin().saveResource(fileS, false);
         }
     }
 

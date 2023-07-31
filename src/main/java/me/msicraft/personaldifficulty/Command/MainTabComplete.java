@@ -23,6 +23,7 @@ public class MainTabComplete implements TabCompleter {
                 arguments.add("set");
                 arguments.add("register");
                 arguments.add("unregister");
+                arguments.add("gui");
                 return arguments;
             }
             if (args.length == 2) {
@@ -46,7 +47,11 @@ public class MainTabComplete implements TabCompleter {
                 String name = args[1];
                 if (DifficultyUtil.hasDifficultyName(name)) {
                     if (args[2].equals("get") || args[2].equals("set")) {
-                        return new ArrayList<>(CustomDifficulty.getVariables());
+                        List<String> arguments = new ArrayList<>();
+                        for (CustomDifficulty.OptionVariables var : CustomDifficulty.OptionVariables.values()) {
+                            arguments.add(var.name());
+                        }
+                        return arguments;
                     }
                 }
             }

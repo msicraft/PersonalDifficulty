@@ -2,43 +2,70 @@ package me.msicraft.personaldifficulty.API.Data;
 
 import me.msicraft.personaldifficulty.PersonalDifficulty;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CustomDifficulty {
 
-    public enum basicDifficulty {
+    public enum BasicDifficulty {
         basic
     }
 
-    private static final List<String> variables = Arrays.asList("DamageTakenMultiplier", "AttackDamageMultiplier", "ExpMultiplier");
-    public static List<String> getVariables() { return variables; }
+    public enum OptionVariablesType {
+        String, Double, Integer, Boolean
+    }
+
+    //private static final List<String> variables = Arrays.asList("DamageTakenMultiplier", "AttackDamageMultiplier", "ExpMultiplier");
+    //public static List<String> getVariables() { return variables; }
+
+    public enum OptionVariables {
+        DamageTakenMultiplier(OptionVariablesType.Double),
+        AttackDamageMultiplier(OptionVariablesType.Double),
+        ExpMultiplier(OptionVariablesType.Double),
+        EnvironmentMultiplier(OptionVariablesType.Double);
+
+        final private OptionVariablesType type;
+        public OptionVariablesType getType() {
+            return type;
+        }
+        OptionVariables(OptionVariablesType type) {
+            this.type = type;
+        }
+    }
 
     private String name;
 
-    private double damageTakenMultiplier = 1.0;
-    private double attackDamageMultiplier = 1.0;
+    private final Map<OptionVariables, Object> optionMap = new HashMap<>();
 
-    private double expMultiplier = 1.0;
+    public Map<OptionVariables, Object> getOptionMap() {
+        return optionMap;
+    }
 
     public CustomDifficulty(String name) {
         this.name = name;
-        if (!name.equals(basicDifficulty.basic.name())) {
+        if (!name.equals(BasicDifficulty.basic.name())) {
             if (PersonalDifficulty.getPlugin().getConfig().contains("Difficulty." + name)) {
-                for (String var : variables) {
-                    String path = "Difficulty." + name + "." + var;
+                for (OptionVariables var : OptionVariables.values()) {
+                    String path = "Difficulty." + name + "." + var.name();
                     if (PersonalDifficulty.getPlugin().getConfig().contains(path)) {
-                        switch (var) {
-                            case "DamageTakenMultiplier":
-                                damageTakenMultiplier = PersonalDifficulty.getPlugin().getConfig().getDouble(path);
+                        optionMap.put(var, PersonalDifficulty.getPlugin().getConfig().get(path));
+                    } else {
+                        Object o = null;
+                        switch (var.getType()) {
+                            case String:
+                                o = "UnKnown";
                                 break;
-                            case "AttackDamageMultiplier":
-                                attackDamageMultiplier = PersonalDifficulty.getPlugin().getConfig().getDouble(path);
+                            case Double:
+                                o = 1.0;
                                 break;
-                            case "ExpMultiplier":
-                                expMultiplier = PersonalDifficulty.getPlugin().getConfig().getDouble(path);
+                            case Integer:
+                                o = 1;
+                                break;
+                            case Boolean:
+                                o = false;
                                 break;
                         }
+                        optionMap.put(var, o);
                     }
                 }
             }
@@ -49,27 +76,16 @@ public class CustomDifficulty {
         return name;
     }
 
-    public double getDamageTakenMultiplier() {
-        return damageTakenMultiplier;
+    public Object getObjectValue(OptionVariables optionVariable) {
+        Object o = null;
+        if (optionMap.containsKey(optionVariable)) {
+            o = optionMap.get(optionVariable);
+        }
+        return o;
     }
 
-    public double getAttackDamageMultiplier() {
-        return attackDamageMultiplier;
+    public void setObjectValue(OptionVariables optionVariable, Object o) {
+        optionMap.put(optionVariable, o);
     }
 
-    public double getExpMultiplier() {
-        return expMultiplier;
-    }
-
-    public void setDamageTakenMultiplier(double damageTakenMultiplier) {
-        this.damageTakenMultiplier = damageTakenMultiplier;
-    }
-
-    public void setAttackDamageMultiplier(double attackDamageMultiplier) {
-        this.attackDamageMultiplier = attackDamageMultiplier;
-    }
-
-    public void setExpMultiplier(double expMultiplier) {
-        this.expMultiplier = expMultiplier;
-    }
 }

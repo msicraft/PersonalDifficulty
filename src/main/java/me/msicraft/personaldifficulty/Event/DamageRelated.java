@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 public class DamageRelated implements Listener {
 
@@ -19,12 +20,13 @@ public class DamageRelated implements Listener {
         if (damager instanceof Player) {
             Player player = (Player) damager;
             PlayerData playerData = PlayerUtil.getPlayerData(player);
-            if (playerData.getDifficultyName().equals(CustomDifficulty.basicDifficulty.basic.name())) {
+            if (playerData.getDifficultyName().equals(CustomDifficulty.BasicDifficulty.basic.name())) {
                 return;
             }
-            double multiplier = DifficultyUtil.getCustomDifficulty(playerData.getDifficultyName()).getAttackDamageMultiplier();
+            CustomDifficulty customDifficulty = DifficultyUtil.getCustomDifficulty(playerData.getDifficultyName());
             double originalDamage = e.getDamage();
-            double cal = originalDamage * multiplier;
+            double attackDamageMultiplier = Double.parseDouble(customDifficulty.getObjectValue(CustomDifficulty.OptionVariables.AttackDamageMultiplier).toString());
+            double cal = originalDamage * attackDamageMultiplier;
             e.setDamage(cal);
         }
     }
@@ -35,12 +37,18 @@ public class DamageRelated implements Listener {
         if (entity instanceof Player) {
             Player player = (Player) entity;
             PlayerData playerData = PlayerUtil.getPlayerData(player);
-            if (playerData.getDifficultyName().equals(CustomDifficulty.basicDifficulty.basic.name())) {
+            if (playerData.getDifficultyName().equals(CustomDifficulty.BasicDifficulty.basic.name())) {
                 return;
             }
-            double multiplier = DifficultyUtil.getCustomDifficulty(playerData.getDifficultyName()).getDamageTakenMultiplier();
+            CustomDifficulty customDifficulty = DifficultyUtil.getCustomDifficulty(playerData.getDifficultyName());
+            EntityDamageEvent.DamageCause damageCause = e.getCause();
             double originalDamage = e.getDamage();
-            double cal = originalDamage * multiplier;
+            if (DifficultyUtil.getEnvironmentalDamageList().contains(damageCause)) {
+                double environmentalDamageMultiplier = Double.parseDouble(customDifficulty.getObjectValue(CustomDifficulty.OptionVariables.EnvironmentMultiplier).toString());
+                originalDamage = originalDamage * environmentalDamageMultiplier;
+            }
+            double takenDamageMultiplier = Double.parseDouble(customDifficulty.getObjectValue(CustomDifficulty.OptionVariables.DamageTakenMultiplier).toString());
+            double cal = originalDamage * takenDamageMultiplier;
             e.setDamage(cal);
         }
     }

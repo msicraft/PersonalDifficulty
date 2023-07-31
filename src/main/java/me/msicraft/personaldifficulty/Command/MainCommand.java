@@ -6,6 +6,7 @@ import me.msicraft.personaldifficulty.API.Data.PlayerData;
 import me.msicraft.personaldifficulty.API.Util.DifficultyUtil;
 import me.msicraft.personaldifficulty.API.Util.MessageUtil;
 import me.msicraft.personaldifficulty.API.Util.PlayerUtil;
+import me.msicraft.personaldifficulty.GUI.MainGui;
 import me.msicraft.personaldifficulty.PersonalDifficulty;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -80,7 +81,7 @@ public class MainCommand implements CommandExecutor {
                                 sendPermissionMessage(sender);
                                 return true;
                             }
-                            String difficulty = CustomDifficulty.basicDifficulty.basic.name();
+                            String difficulty = CustomDifficulty.BasicDifficulty.basic.name();
                             try {
                                 target = Bukkit.getPlayer(args[1]);
                                 difficulty = args[2];
@@ -139,6 +140,18 @@ public class MainCommand implements CommandExecutor {
                                 sender.sendMessage(ChatColor.RED + "/pd unregister [difficultyname]");
                             }
                             break;
+                        case "gui": //pd gui
+                            if (!sender.hasPermission("personaldifficulty.command.gui")) {
+                                sendPermissionMessage(sender);
+                                return true;
+                            }
+                            if (sender instanceof Player) {
+                                Player player = (Player) sender;
+                                MainGui mainGui = new MainGui();
+                                player.openInventory(mainGui.getInventory());
+                                mainGui.setUp();
+                            }
+                            break;
                         case "difficulty": //pd difficulty [customDifficultyName] [get,set] [variable] [{optional}value]
                             if (!sender.hasPermission("personaldifficulty.command.difficulty")) {
                                 sendPermissionMessage(sender);
@@ -146,15 +159,15 @@ public class MainCommand implements CommandExecutor {
                             }
                             String difficultyName;
                             String arg2 = null;
-                            String variable = null;
+                            CustomDifficulty.OptionVariables variable = null;
                             try {
                                 difficultyName = args[1];
                                 arg2 = args[2];
-                                variable = args[3];
+                                variable = CustomDifficulty.OptionVariables.valueOf(args[3]);
                             } catch (ArrayIndexOutOfBoundsException e) {
-                                difficultyName = CustomDifficulty.basicDifficulty.basic.name();
+                                difficultyName = CustomDifficulty.BasicDifficulty.basic.name();
                             }
-                            if (difficultyName.equals(CustomDifficulty.basicDifficulty.basic.name())) {
+                            if (difficultyName.equals(CustomDifficulty.BasicDifficulty.basic.name())) {
                                 sender.sendMessage(ChatColor.RED + "/pd difficulty [customDifficultyName] [get,set] [variable] [{optional}value]");
                                 return true;
                             }
@@ -167,47 +180,18 @@ public class MainCommand implements CommandExecutor {
                                 sender.sendMessage(ChatColor.GREEN + "Difficulty Name: " + ChatColor.GRAY + customDifficulty.getName());
                                 switch (arg2) {
                                     case "get":
-                                        switch (variable) {
-                                            case "DamageTakenMultiplier":
-                                                sender.sendMessage(ChatColor.GREEN + variable + ": " + ChatColor.GRAY + customDifficulty.getDamageTakenMultiplier());
-                                                break;
-                                            case "AttackDamageMultiplier":
-                                                sender.sendMessage(ChatColor.GREEN + variable + ": " + ChatColor.GRAY + customDifficulty.getAttackDamageMultiplier());
-                                                break;
-                                            case "ExpMultiplier":
-                                                sender.sendMessage(ChatColor.GREEN + variable + ": " + ChatColor.GRAY + customDifficulty.getExpMultiplier());
-                                                break;
-                                        }
+                                        sendDifficultyInfo(sender, variable, customDifficulty.getObjectValue(variable));
                                         break;
                                     case "set":
-                                        double value;
+                                        Object value;
                                         try {
-                                            String s = args[4];
-                                            value = Double.parseDouble(s);
+                                            value = args[4];
                                         } catch (ArrayIndexOutOfBoundsException e) {
                                             value = 1.0;
                                         }
-                                        double before;
-                                        switch (variable) {
-                                            case "DamageTakenMultiplier":
-                                                before = customDifficulty.getDamageTakenMultiplier();
-                                                sender.sendMessage(ChatColor.GREEN + "Before " + variable + ": " + ChatColor.GRAY + before);
-                                                sender.sendMessage(ChatColor.GREEN + "After " + variable + ": " + ChatColor.GRAY + value);
-                                                customDifficulty.setDamageTakenMultiplier(value);
-                                                break;
-                                            case "AttackDamageMultiplier":
-                                                before = customDifficulty.getAttackDamageMultiplier();
-                                                sender.sendMessage(ChatColor.GREEN + "Before " + variable + ": " + ChatColor.GRAY + before);
-                                                sender.sendMessage(ChatColor.GREEN + "After " + variable + ": " + ChatColor.GRAY + value);
-                                                customDifficulty.setAttackDamageMultiplier(value);
-                                                break;
-                                            case "ExpMultiplier":
-                                                before = customDifficulty.getExpMultiplier();
-                                                sender.sendMessage(ChatColor.GREEN + "Before " + variable + ": " + ChatColor.GRAY + before);
-                                                sender.sendMessage(ChatColor.GREEN + "After " + variable + ": " + ChatColor.GRAY + value);
-                                                customDifficulty.setExpMultiplier(value);
-                                                break;
-                                        }
+                                        Object object = customDifficulty.getObjectValue(variable);
+                                        customDifficulty.setObjectValue(variable, value);
+                                        sendDifficultyChangeMessage(sender, variable, object, value);
                                         break;
                                 }
                             } else {
@@ -219,6 +203,15 @@ public class MainCommand implements CommandExecutor {
             }
         }
         return false;
+    }
+
+    private void sendDifficultyInfo(CommandSender sender, CustomDifficulty.OptionVariables optionVariables, Object value) {
+        sender.sendMessage(ChatColor.GREEN + optionVariables.name() + ": " + ChatColor.GRAY + value);
+    }
+
+    private void sendDifficultyChangeMessage(CommandSender sender, CustomDifficulty.OptionVariables optionVariables, Object before, Object after) {
+        sender.sendMessage(ChatColor.GREEN + "Before " + optionVariables.name() + ": " + ChatColor.GRAY + before);
+        sender.sendMessage(ChatColor.GREEN + "After " + optionVariables.name() + ": " + ChatColor.GRAY + after);
     }
 
 }

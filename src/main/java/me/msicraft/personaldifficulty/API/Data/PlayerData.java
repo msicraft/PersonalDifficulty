@@ -14,7 +14,7 @@ public class PlayerData {
         this.player = player;
         this.playerDataFile = new PlayerDataFile(player);
         FileConfiguration config = playerDataFile.getConfig();
-        difficultyName = config.contains("Difficulty") ? config.getString("Difficulty") : CustomDifficulty.basicDifficulty.basic.name();
+        difficultyName = config.contains("Difficulty") ? config.getString("Difficulty") : CustomDifficulty.BasicDifficulty.basic.name();
     }
 
     public Player getPlayer() {

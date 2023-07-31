@@ -16,10 +16,11 @@ public class ExpRelated implements Listener {
     public void playerGetExp(PlayerExpChangeEvent e) {
         Player player = e.getPlayer();
         PlayerData playerData = PlayerUtil.getPlayerData(player);
-        if (playerData.getDifficultyName().equals(CustomDifficulty.basicDifficulty.basic.name())) {
+        if (playerData.getDifficultyName().equals(CustomDifficulty.BasicDifficulty.basic.name())) {
             return;
         }
-        double multiplier = DifficultyUtil.getCustomDifficulty(playerData.getDifficultyName()).getExpMultiplier();
+        CustomDifficulty customDifficulty = DifficultyUtil.getCustomDifficulty(playerData.getDifficultyName());
+        double multiplier = Double.parseDouble(customDifficulty.getObjectValue(CustomDifficulty.OptionVariables.ExpMultiplier).toString());
         int amount = e.getAmount();
         double roundCal = Math.round(amount * multiplier * 10.0) / 10.0;
         int cal = (int) Math.round(roundCal);

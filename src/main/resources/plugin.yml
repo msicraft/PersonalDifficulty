@@ -1,5 +1,5 @@
 name: PersonalDifficulty
-version: 1.0 #'${project.version}'
+version: 1.1 #'${project.version}'
 main: me.msicraft.personaldifficulty.PersonalDifficulty
 api-version: 1.16
 authors: [ msicraft ]

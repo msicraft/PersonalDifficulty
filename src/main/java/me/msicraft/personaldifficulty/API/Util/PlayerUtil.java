@@ -3,6 +3,7 @@ package me.msicraft.personaldifficulty.API.Util;
 import me.msicraft.personaldifficulty.API.Data.CustomDifficulty;
 import me.msicraft.personaldifficulty.API.Data.PlayerData;
 import me.msicraft.personaldifficulty.DataFile.PlayerDataFile;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
@@ -57,18 +58,34 @@ public class PlayerUtil {
         playerDataFile.saveConfig();
     }
 
+    public static String getDifficultyName(OfflinePlayer offlinePlayer) {
+        String name = CustomDifficulty.BasicDifficulty.basic.name();
+        if (offlinePlayer.isOnline()) {
+            PlayerData playerData = getPlayerData(offlinePlayer.getPlayer());
+            name = playerData.getDifficultyName();
+        } else {
+            PlayerDataFile playerDataFile = new PlayerDataFile(offlinePlayer.getUniqueId());
+            if (playerDataFile.hasConfigFile()) {
+                if (playerDataFile.getConfig().contains("Difficulty")) {
+                    name = playerDataFile.getConfig().getString("Difficulty");
+                }
+            }
+        }
+        return name;
+    }
+
     public static void checkDifficulty(Player player) {
         PlayerData playerData = getPlayerData(player);
         String name = playerData.getDifficultyName();
         if (!DifficultyUtil.hasDifficultyName(name)) {
-            playerData.setDifficultyName(CustomDifficulty.basicDifficulty.basic.name());
+            playerData.setDifficultyName(CustomDifficulty.BasicDifficulty.basic.name());
         }
     }
 
     public static void checkDifficulty(PlayerData playerData) {
         String name = playerData.getDifficultyName();
         if (!DifficultyUtil.hasDifficultyName(name)) {
-            playerData.setDifficultyName(CustomDifficulty.basicDifficulty.basic.name());
+            playerData.setDifficultyName(CustomDifficulty.BasicDifficulty.basic.name());
         }
     }
 

@@ -9,6 +9,8 @@ import me.msicraft.personaldifficulty.DataFile.MessageDataFile;
 import me.msicraft.personaldifficulty.Event.BasicEvent;
 import me.msicraft.personaldifficulty.Event.DamageRelated;
 import me.msicraft.personaldifficulty.Event.ExpRelated;
+import me.msicraft.personaldifficulty.GUI.Event.ChatEditEvent;
+import me.msicraft.personaldifficulty.GUI.Event.GuiEvent;
 import me.msicraft.personaldifficulty.bStats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -75,6 +77,9 @@ public final class PersonalDifficulty extends JavaPlugin {
     public void onDisable() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             PlayerUtil.savePlayerData(player);
+            if (ChatEditEvent.hasEditDifficultyTag(player)) {
+                ChatEditEvent.setEditDifficultyKey(player, false, null);
+            }
         }
         for (String difficultyName : DifficultyUtil.getDifficultyNames()) {
             DifficultyUtil.saveCustomDifficulty(difficultyName);
@@ -87,6 +92,8 @@ public final class PersonalDifficulty extends JavaPlugin {
         pluginManager.registerEvents(new BasicEvent(), this);
         pluginManager.registerEvents(new DamageRelated(), this);
         pluginManager.registerEvents(new ExpRelated(), this);
+        pluginManager.registerEvents(new GuiEvent(), this);
+        pluginManager.registerEvents(new ChatEditEvent(), this);
     }
 
     public void reloadDataFiles() {

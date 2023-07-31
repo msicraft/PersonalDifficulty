@@ -5,12 +5,13 @@ import me.msicraft.personaldifficulty.PersonalDifficulty;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.*;
 
 public class DifficultyUtil {
 
-    private static final CustomDifficulty basicDifficulty = new CustomDifficulty(CustomDifficulty.basicDifficulty.basic.name());
+    private static final CustomDifficulty basicDifficulty = new CustomDifficulty(CustomDifficulty.BasicDifficulty.basic.name());
 
     private static final Map<String, CustomDifficulty> difficultyMap = new HashMap<>();
 
@@ -33,6 +34,7 @@ public class DifficultyUtil {
         for (String name : difficultyNames) {
             registerDifficulty(name);
         }
+        setEnvironmentalDamageList();
         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + PersonalDifficulty.getPrefix() + ChatColor.WHITE +
                 " A total of " + ChatColor.GREEN  + difficultyNames.size() + ChatColor.WHITE + " difficulties have been registered");
     }
@@ -40,16 +42,30 @@ public class DifficultyUtil {
     public static void saveCustomDifficulty(String name) {
         if (difficultyMap.containsKey(name)) {
             CustomDifficulty customDifficulty = getCustomDifficulty(name);
-            saveCustomDifficulty(customDifficulty);
+            for (CustomDifficulty.OptionVariables optionVariable : CustomDifficulty.OptionVariables.values()) {
+                saveCustomDifficulty(customDifficulty, optionVariable);
+            }
+            PersonalDifficulty.getPlugin().saveConfig();
         }
     }
 
-    public static void saveCustomDifficulty(CustomDifficulty customDifficulty) {
-        String path = "Difficulty." + customDifficulty.getName();
-        PersonalDifficulty.getPlugin().getConfig().set(path + ".DamageTakenMultiplier", customDifficulty.getDamageTakenMultiplier());
-        PersonalDifficulty.getPlugin().getConfig().set(path + ".AttackDamageMultiplier", customDifficulty.getAttackDamageMultiplier());
-        PersonalDifficulty.getPlugin().getConfig().set(path + ".ExpMultiplier", customDifficulty.getExpMultiplier());
-        PersonalDifficulty.getPlugin().saveConfig();
+    public static void saveCustomDifficulty(CustomDifficulty customDifficulty, CustomDifficulty.OptionVariables optionVariable) {
+        String path = "Difficulty." + customDifficulty.getName() + "." + optionVariable.name();
+        Object value = customDifficulty.getObjectValue(optionVariable);
+        switch (optionVariable.getType()) {
+            case String:
+                PersonalDifficulty.getPlugin().getConfig().set(path, value.toString());
+                break;
+            case Double:
+                PersonalDifficulty.getPlugin().getConfig().set(path, Double.parseDouble(value.toString()));
+                break;
+            case Integer:
+                PersonalDifficulty.getPlugin().getConfig().set(path, Integer.parseInt(value.toString()));
+                break;
+            case Boolean:
+                PersonalDifficulty.getPlugin().getConfig().set(path, Boolean.parseBoolean(value.toString()));
+                break;
+        }
     }
 
     public static void registerDifficulty(String name) {
@@ -57,7 +73,7 @@ public class DifficultyUtil {
         difficultyMap.put(name, customDifficulty);
         if (!difficultyNames.contains(name)) {
             difficultyNames.add(name);
-            saveCustomDifficulty(customDifficulty);
+            saveCustomDifficulty(name);
         }
     }
 
@@ -80,6 +96,29 @@ public class DifficultyUtil {
             customDifficulty = difficultyMap.get(name);
         }
         return customDifficulty;
+    }
+
+    private static final List<EntityDamageEvent.DamageCause> environmentalDamageList = new ArrayList<>();
+
+    public static List<EntityDamageEvent.DamageCause> getEnvironmentalDamageList() {
+        return environmentalDamageList;
+    }
+
+    private static void setEnvironmentalDamageList() {
+        if (!environmentalDamageList.isEmpty()) {
+            environmentalDamageList.clear();
+        }
+        if (PersonalDifficulty.getPlugin().getConfig().contains("EnvironmentalDamageList")) {
+            List<String> list = PersonalDifficulty.getPlugin().getConfig().getStringList("EnvironmentalDamageList");
+            EntityDamageEvent.DamageCause damageCause;
+            for (String s : list) {
+                try {
+                    damageCause = EntityDamageEvent.DamageCause.valueOf(s.toUpperCase());
+                    environmentalDamageList.add(damageCause);
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+        }
     }
 
 }
